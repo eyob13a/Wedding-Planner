@@ -11,6 +11,7 @@ import com.org.debrebirhan.weddingplanner.ui.screens.budget.BudgetScreen
 import com.org.debrebirhan.weddingplanner.ui.screens.dashboard.DashboardScreen
 import com.org.debrebirhan.weddingplanner.ui.screens.guests.GuestsScreen
 import com.org.debrebirhan.weddingplanner.ui.screens.tasks.TasksScreen
+import com.org.debrebirhan.weddingplanner.ui.screens.profile.ProfileScreen // 👈 🟢 1. ProfileScreen እዚህ ጋ ኢንፖርት ተደርጓል
 import com.org.debrebirhan.weddingplanner.ui.viewmodel.WeddingViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -61,11 +62,13 @@ fun MainScreenContainer(viewModel: WeddingViewModel) {
         }
     ) { innerPadding ->
         Surface(modifier = Modifier.padding(innerPadding)) {
+            // 🔗 🟢 2. የገጾች ዝውውር ሎጂክ (Navigation Logic) ትክክለኛው ማስተካከያ
             when (selectedTab) {
                 0 -> DashboardScreen(viewModel = viewModel)
                 1 -> TasksScreen(viewModel = viewModel)
                 2 -> GuestsScreen(viewModel = viewModel)
                 3 -> BudgetScreen(viewModel = viewModel)
+                4 -> ProfileScreen(viewModel = viewModel) // 👈 ቁጥር 4 ሲሆን በትክክል ፕሮፋይል ይከፈታል
                 else -> DashboardScreen(viewModel = viewModel)
             }
         }

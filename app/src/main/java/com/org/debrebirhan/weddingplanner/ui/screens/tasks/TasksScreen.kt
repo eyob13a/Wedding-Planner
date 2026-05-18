@@ -25,7 +25,7 @@ fun TasksScreen(viewModel: WeddingViewModel) {
         OutlinedTextField(
             value = taskTitle,
             onValueChange = { taskTitle = it },
-            label = { Text("Task Name (e.g., Book the venue)") },
+            label = { Text("Task Name") },
             modifier = Modifier.fillMaxWidth(),
             colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = primaryRose, focusedLabelColor = primaryRose)
         )

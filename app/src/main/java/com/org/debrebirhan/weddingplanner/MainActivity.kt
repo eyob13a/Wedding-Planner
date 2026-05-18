@@ -18,7 +18,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Context persistence using SharedPreferences
+        // አፑ ለመጀመሪያ ጊዜ እየተከፈተ መሆኑን (Onboarding ማለፉን) ብቻ ለመለየት የምንጠቀምበት Preferences
         val sharedPreferences = getSharedPreferences("WeddingPlannerPrefs", Context.MODE_PRIVATE)
 
         setContent {
@@ -28,32 +28,20 @@ class MainActivity : ComponentActivity() {
                         mutableStateOf(sharedPreferences.getBoolean("isSetupComplete", false))
                     }
 
-                    // Preload saved data into ViewModel state on launch
-                    LaunchedEffect(Unit) {
-                        weddingViewModel.groomName.value = sharedPreferences.getString("groomName", "") ?: ""
-                        weddingViewModel.brideName.value = sharedPreferences.getString("brideName", "") ?: ""
-                        weddingViewModel.totalBudget.value = sharedPreferences.getString("weddingBudget", "0")?.toDoubleOrNull() ?: 0.0
-                        weddingViewModel.weddingTimestamp.value = sharedPreferences.getLong("weddingTimestamp", 0L)
-                    }
-
                     if (!isSetupComplete) {
-                        OnboardingScreen(onSetupComplete = { g, b, bud, time ->
-                            weddingViewModel.groomName.value = g
-                            weddingViewModel.brideName.value = b
-                            weddingViewModel.totalBudget.value = bud.toDoubleOrNull() ?: 0.0
-                            weddingViewModel.weddingTimestamp.value = time
-                            isSetupComplete = true
+                        // 🎯 እዚህ ጋ አዲሱን አጠራር (viewModel = weddingViewModel) በትክክል አስገብተነዋል
+                        OnboardingScreen(
+                            viewModel = weddingViewModel,
+                            onSetupComplete = { g, b, bud, time ->
+                                isSetupComplete = true
 
-                            // Commit data securely to local device storage
-                            sharedPreferences.edit().apply {
-                                putBoolean("isSetupComplete", true)
-                                putString("groomName", g)
-                                putString("brideName", b)
-                                putString("weddingBudget", bud)
-                                putLong("weddingTimestamp", time)
-                                apply()
+                                // Onboarding ማለፉን ብቻ እዚህ ጋር እንመዘግባለን (ሌላው ዳታ በ ViewModel ውስጥ ተቀምጧል)
+                                sharedPreferences.edit().apply {
+                                    putBoolean("isSetupComplete", true)
+                                    apply()
+                                }
                             }
-                        })
+                        )
                     } else {
                         // Forward view context straight to main interface
                         MainScreenContainer(viewModel = weddingViewModel)

@@ -11,7 +11,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -26,10 +25,14 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.org.debrebirhan.weddingplanner.ui.viewmodel.WeddingViewModel
 import java.util.*
 
 @Composable
-fun OnboardingScreen(onSetupComplete: (String, String, String, Long) -> Unit) {
+fun OnboardingScreen(
+    viewModel: WeddingViewModel, // 🎯 ቪውሞዴሉ እዚህ ጋር እንዲደርሰን ተጨምሯል
+    onSetupComplete: (String, String, String, Long) -> Unit
+) {
     var currentStep by remember { mutableStateOf(0) }
 
     val backgroundColor = Color(0xFFFDF8F5)
@@ -59,25 +62,28 @@ fun OnboardingScreen(onSetupComplete: (String, String, String, Long) -> Unit) {
             ) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.padding(top = 80.dp)
+                    modifier = Modifier.padding(top = 70.dp)
                 ) {
                     Surface(
-                        modifier = Modifier.size(90.dp),
+                        modifier = Modifier.size(140.dp),
                         shape = CircleShape,
-                        color = Color.Transparent,
-                        border = BorderStroke(1.dp, primaryRose.copy(alpha = 0.4f))
+                        color = Color.White,
+                        border = BorderStroke(2.5.dp, primaryRose.copy(alpha = 0.7f)),
+                        shadowElevation = 6.dp
                     ) {
                         Box(contentAlignment = Alignment.Center) {
-                            Icon(
-                                imageVector = Icons.Default.Favorite,
-                                contentDescription = "Heart",
-                                tint = primaryRose,
-                                modifier = Modifier.size(40.dp)
-                            )
+                            Row(
+                                horizontalArrangement = Arrangement.Center,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(text = "🤵‍♂️", fontSize = 54.sp)
+                                Text(text = "💐", fontSize = 32.sp, modifier = Modifier.offset(x = (-8).dp, y = 10.dp))
+                                Text(text = "👰‍♀️", fontSize = 54.sp, modifier = Modifier.offset(x = (-14).dp))
+                            }
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(28.dp))
 
                     Canvas(modifier = Modifier.size(width = 120.dp, height = 40.dp)) {
                         drawCircle(color = primaryRose, radius = 12f, center = Offset(size.width/2, size.height/2))
@@ -123,7 +129,7 @@ fun OnboardingScreen(onSetupComplete: (String, String, String, Long) -> Unit) {
 
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.padding(bottom = 40.dp)
+                    modifier = Modifier.padding(bottom = 60.dp)
                 ) {
                     Button(
                         onClick = { currentStep = 1 },
@@ -139,38 +145,24 @@ fun OnboardingScreen(onSetupComplete: (String, String, String, Long) -> Unit) {
                             color = Color.White
                         )
                     }
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    Text(
-                        text = "Sign in to your account",
-                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Normal),
-                        color = darkText.copy(alpha = 0.7f),
-                        modifier = Modifier.clickable { }
-                    )
-
-                    Spacer(modifier = Modifier.height(40.dp))
-
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Surface(modifier = Modifier.size(8.dp), shape = CircleShape, color = primaryRose) {}
-                        Surface(modifier = Modifier.size(8.dp), shape = CircleShape, color = primaryRose.copy(alpha = 0.3f)) {}
-                        Surface(modifier = Modifier.size(8.dp), shape = CircleShape, color = primaryRose.copy(alpha = 0.3f)) {}
-                    }
                 }
             }
         }
     } else {
-        var groomName by remember { mutableStateOf("") }
-        var brideName by remember { mutableStateOf("") }
-        var weddingBudget by remember { mutableStateOf("") }
+        var groomName by remember { mutableStateOf(viewModel.groomName.value) }
+        var brideName by remember { mutableStateOf(viewModel.brideName.value) }
+        var weddingBudget by remember { mutableStateOf(if(viewModel.totalBudget.value > 0) viewModel.totalBudget.value.toInt().toString() else "") }
         var selectedDateText by remember { mutableStateOf("Select Wedding Date") }
-        var weddingTimestamp by remember { mutableStateOf(0L) }
+        var weddingTimestamp by remember { mutableStateOf(viewModel.weddingTimestamp.value) }
 
         val context = LocalContext.current
         val calendar = Calendar.getInstance()
+
+        // ከዚህ በፊት የተመረጠ ቀን ካለ እሱን በፅሁፍ ማሳያ
+        if (weddingTimestamp != 0L) {
+            val savedCalendar = Calendar.getInstance().apply { timeInMillis = weddingTimestamp }
+            selectedDateText = "${savedCalendar.get(Calendar.DAY_OF_MONTH)}/${savedCalendar.get(Calendar.MONTH) + 1}/${savedCalendar.get(Calendar.YEAR)}"
+        }
 
         val datePickerDialog = DatePickerDialog(
             context,
@@ -256,6 +248,16 @@ fun OnboardingScreen(onSetupComplete: (String, String, String, Long) -> Unit) {
                 Button(
                     onClick = {
                         if (groomName.isNotBlank() && brideName.isNotBlank() && weddingBudget.isNotBlank() && weddingTimestamp != 0L) {
+                            // 🎯 መጀመሪያ በቪውሞዴሉ ውስጥ ያሉትን ተለዋዋጮች እናድሳለን
+                            viewModel.groomName.value = groomName
+                            viewModel.brideName.value = brideName
+                            viewModel.totalBudget.value = weddingBudget.toDoubleOrNull() ?: 0.0
+                            viewModel.weddingTimestamp.value = weddingTimestamp
+
+                            // 🎯 ወዲያውኑ ዳታው እንዳይጠፋ ስልኩ ማከማቻ (Preferences) ላይ እንቆልፈዋለን
+                            viewModel.saveDataToStorage()
+
+                            // ወደ ቀጣዩ ዳሽቦርድ ማለፍ
                             onSetupComplete(groomName, brideName, weddingBudget, weddingTimestamp)
                         }
                     },

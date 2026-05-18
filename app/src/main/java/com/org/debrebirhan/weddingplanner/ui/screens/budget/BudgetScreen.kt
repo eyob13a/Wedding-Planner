@@ -28,7 +28,7 @@ fun BudgetScreen(viewModel: WeddingViewModel) {
         OutlinedTextField(
             value = expenseTitle,
             onValueChange = { expenseTitle = it },
-            label = { Text("Expense Description (e.g., Food / Catering)") },
+            label = { Text("Expense Description") },
             modifier = Modifier.fillMaxWidth(),
             colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = primaryRose, focusedLabelColor = primaryRose)
         )

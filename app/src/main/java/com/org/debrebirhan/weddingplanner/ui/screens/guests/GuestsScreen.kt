@@ -75,8 +75,10 @@ fun GuestsScreen(viewModel: WeddingViewModel) {
             Spacer(modifier = Modifier.width(8.dp))
             Button(
                 onClick = {
-                    viewModel.addGuest(guestName)
-                    guestName = ""
+                    if (guestName.isNotBlank()) {
+                        viewModel.addGuest(guestName)
+                        guestName = ""
+                    }
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = primaryRose),
                 shape = RoundedCornerShape(12.dp),
@@ -124,7 +126,7 @@ fun GuestsScreen(viewModel: WeddingViewModel) {
                                 .background(viewModel.selectedTemplate.value.color, CircleShape),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text(text = guest.name.take(1), color = Color.White, fontWeight = FontWeight.Bold)
+                            Text(text = guest.name.take(1).uppercase(), color = Color.White, fontWeight = FontWeight.Bold)
                         }
                         Spacer(modifier = Modifier.width(12.dp))
                         Text(text = guest.name, modifier = Modifier.weight(1f), fontWeight = FontWeight.Medium)
@@ -139,8 +141,8 @@ fun GuestsScreen(viewModel: WeddingViewModel) {
                                 val imageUri = generateWeddingCardImage(
                                     context = context,
                                     guestName = guest.name,
-                                    groomName = viewModel.groomName.value,
-                                    brideName = viewModel.brideName.value,
+                                    groomName = viewModel.groomName.value.ifBlank { "Groom" },
+                                    brideName = viewModel.brideName.value.ifBlank { "Bride" },
                                     dateText = weddingDate,
                                     backgroundColor = viewModel.selectedTemplate.value.color.toArgb()
                                 )
@@ -168,7 +170,7 @@ fun GuestsScreen(viewModel: WeddingViewModel) {
     }
 }
 
-// Enhanced canvas architecture displaying geometric shapes and luxury design components
+// 🎨 የተስተካከለው የግብዣ ካርድ መስሪያ - አሁን የሙሽሮቹን ስዕል በትልቅ መሃል ላይ ይይዛል!
 fun generateWeddingCardImage(
     context: Context,
     guestName: String,
@@ -184,11 +186,11 @@ fun generateWeddingCardImage(
 
     val goldColor = android.graphics.Color.parseColor("#D4AF37")
 
-    // 1. Solid Canvas Background Fill Layer
+    // 1. Background Fill
     val bgPaint = Paint().apply { color = backgroundColor }
     canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), bgPaint)
 
-    // 2. High Elegance Double Gold Framing Borders
+    // 2. Framing Borders
     val borderPaint = Paint().apply {
         color = goldColor
         style = Paint.Style.STROKE
@@ -200,7 +202,7 @@ fun generateWeddingCardImage(
     borderPaint.strokeWidth = 2f
     canvas.drawRect(RectF(52f, 52f, (width - 52).toFloat(), (height - 52).toFloat()), borderPaint)
 
-    // 3. Programmatic Symmetrical Geometric Corner Leaf Patterns
+    // 3. Geometric Corner Ornaments
     val leafPaint = Paint().apply {
         color = goldColor
         style = Paint.Style.FILL
@@ -232,7 +234,7 @@ fun generateWeddingCardImage(
     drawCornerOrnament((width - 60).toFloat(), (height - 60).toFloat(), 180f)
     drawCornerOrnament(60f, (height - 60).toFloat(), 270f)
 
-    // 4. Elegant Typography Layout Stack Configuration
+    // 4. Typography and Drawing Components
     val textPaint = Paint().apply {
         color = android.graphics.Color.WHITE
         isAntiAlias = true
@@ -243,65 +245,76 @@ fun generateWeddingCardImage(
     // Main Header Phrase
     textPaint.textSize = 36f
     textPaint.letterSpacing = 0.1f
-    canvas.drawText("The Wedding Invitation", (width / 2).toFloat(), 180f, textPaint)
+    canvas.drawText("The Wedding Invitation", (width / 2).toFloat(), 150f, textPaint)
 
-    // Decorative Geometric Divider Separator Line
+    // 🎯 [አዲስ ክፍል]፦ የሙሽራና ሙሽሪት ስዕል (Emojis) በትልቅ መጠን ካርዱ መሃል ላይ ተቃቅፈው እንዲቀመጡ ተደርጓል
+    val emojiPaint = Paint().apply {
+        isAntiAlias = true
+        textAlign = Paint.Align.CENTER
+        textSize = 90f // በካርዱ ላይ በደንብ ጎልቶ እንዲታይ የተሰጠ መጠን
+    }
+    // ወንዱ፣ አበባው እና ሴቷ ተደራርበው የጋብቻውን ድባብ ይፈጥራሉ
+    canvas.drawText("🤵‍♂️", (width / 2 - 55).toFloat(), 280f, emojiPaint)
+    canvas.drawText("💐", (width / 2 - 5).toFloat(), 300f, Paint().apply { isAntiAlias = true; textAlign = Paint.Align.CENTER; textSize = 50f })
+    canvas.drawText("👰‍♀️", (width / 2 + 45).toFloat(), 280f, emojiPaint)
+
+    // Divider Separator Line
     val dividerPaint = Paint().apply {
         color = goldColor
         strokeWidth = 3f
         isAntiAlias = true
     }
-    canvas.drawCircle((width / 2).toFloat(), 230f, 6f, leafPaint)
-    canvas.drawLine((width / 2 - 120).toFloat(), 230f, (width / 2 - 20).toFloat(), 230f, dividerPaint)
-    canvas.drawLine((width / 2 + 20).toFloat(), 230f, (width / 2 + 120).toFloat(), 230f, dividerPaint)
+    canvas.drawCircle((width / 2).toFloat(), 350f, 6f, leafPaint)
+    canvas.drawLine((width / 2 - 120).toFloat(), 350f, (width / 2 - 20).toFloat(), 350f, dividerPaint)
+    canvas.drawLine((width / 2 + 20).toFloat(), 350f, (width / 2 + 120).toFloat(), 350f, dividerPaint)
 
     // Guest Welcome Wording Phrase Section
     textPaint.typeface = Typeface.create(Typeface.SERIF, Typeface.NORMAL)
-    textPaint.textSize = 30f
+    textPaint.textSize = 28f
     textPaint.color = android.graphics.Color.parseColor("#E0E0E0")
-    canvas.drawText("With joyful hearts, we request the honor of", (width / 2).toFloat(), 340f, textPaint)
-    canvas.drawText("the presence of", (width / 2).toFloat(), 385f, textPaint)
+    canvas.drawText("With joyful hearts, we request the honor of", (width / 2).toFloat(), 440f, textPaint)
+    canvas.drawText("the presence of", (width / 2).toFloat(), 485f, textPaint)
 
     // Dedicated Guest Specification Label
     textPaint.typeface = Typeface.create(Typeface.SERIF, Typeface.BOLD)
     textPaint.textSize = 54f
     textPaint.color = goldColor
-    canvas.drawText(guestName, (width / 2).toFloat(), 480f, textPaint)
+    canvas.drawText(guestName, (width / 2).toFloat(), 580f, textPaint)
 
     // Intersecting Connecting Phrase Block
     textPaint.typeface = Typeface.create(Typeface.SERIF, Typeface.ITALIC)
-    textPaint.textSize = 28f
+    textPaint.textSize = 26f
     textPaint.color = android.graphics.Color.parseColor("#E0E0E0")
-    canvas.drawText("at the holy matrimony celebrating the love of", (width / 2).toFloat(), 580f, textPaint)
+    canvas.drawText("at the holy matrimony celebrating the love of", (width / 2).toFloat(), 670f, textPaint)
 
-    // Master Unified Couples Typography
+    // Master Unified Couples Typography (& በ ❤️ ተተክቷል)
     textPaint.typeface = Typeface.create(Typeface.SERIF, Typeface.BOLD)
     textPaint.textSize = 68f
     textPaint.color = android.graphics.Color.WHITE
-    canvas.drawText(groomName, (width / 2).toFloat(), 700f, textPaint)
+    canvas.drawText(groomName, (width / 2).toFloat(), 780f, textPaint)
 
     textPaint.typeface = Typeface.create(Typeface.SERIF, Typeface.ITALIC)
-    textPaint.textSize = 46f
-    textPaint.color = goldColor
-    canvas.drawText("&", (width / 2).toFloat(), 775f, textPaint)
+    textPaint.textSize = 50f
+    textPaint.color = android.graphics.Color.parseColor("#D32F2F") // ቀይ የልብ ቀለም
+    canvas.drawText("❤️", (width / 2).toFloat(), 865f, textPaint)
 
     textPaint.typeface = Typeface.create(Typeface.SERIF, Typeface.BOLD)
     textPaint.textSize = 68f
     textPaint.color = android.graphics.Color.WHITE
-    canvas.drawText(brideName, (width / 2).toFloat(), 870f, textPaint)
+    canvas.drawText(brideName, (width / 2).toFloat(), 960f, textPaint)
 
     // Calendar Save-The-Date Block Footer Component
     textPaint.typeface = Typeface.create(Typeface.SERIF, Typeface.NORMAL)
-    textPaint.textSize = 30f
+    textPaint.textSize = 28f
     textPaint.color = android.graphics.Color.parseColor("#E0E0E0")
-    canvas.drawText("Please save our date:", (width / 2).toFloat(), 1000f, textPaint)
+    canvas.drawText("Please save our date:", (width / 2).toFloat(), 1070f, textPaint)
 
     textPaint.typeface = Typeface.create(Typeface.SERIF, Typeface.BOLD)
     textPaint.textSize = 36f
     textPaint.color = goldColor
-    canvas.drawText(dateText, (width / 2).toFloat(), 1060f, textPaint)
+    canvas.drawText(dateText, (width / 2).toFloat(), 1125f, textPaint)
 
-    // 5. Compress binary components safely into local file cache storage
+    // 5. Compress safely into file cache storage
     try {
         val cachePath = File(context.cacheDir, "images")
         cachePath.mkdirs()

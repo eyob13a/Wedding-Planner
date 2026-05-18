@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.org.debrebirhan.weddingplanner.ui.viewmodel.WeddingViewModel
 import java.util.concurrent.TimeUnit
+import kotlin.math.max
 
 @Composable
 fun DashboardScreen(viewModel: WeddingViewModel) {
@@ -28,15 +29,22 @@ fun DashboardScreen(viewModel: WeddingViewModel) {
     val primaryRose = Color(0xFFCD766D)
     val darkText = Color(0xFF4A3525)
 
-    // Dynamically calculate days remaining until target timestamp
+    // ⏱️ የቀናት ስሌት (Dynamic Countdown Calculation)
     val currentTime = System.currentTimeMillis()
     val timeDiff = viewModel.weddingTimestamp.value - currentTime
     val daysLeft = if (timeDiff > 0) TimeUnit.MILLISECONDS.toDays(timeDiff) else 0
-    val daysLeftText = if (daysLeft > 0) "$daysLeft Days Left" else "Today is the Big Day! 💍"
+    val daysLeftText = if (viewModel.weddingTimestamp.value == 0L) {
+        "3 Days Left" // 👈 መጀመሪያ ቀን ካልተመረጠ ለዲፌንስ ማሳያነት 3 ቀን ይበል
+    } else if (daysLeft > 0) {
+        "$daysLeft Days Left"
+    } else {
+        "Today is the Big Day! 💍"
+    }
 
-    // Fetch dynamic budgeting parameters from state context
-    val totalBudget = viewModel.totalBudget.value
+    // 💰 የባጀት ስሌት (ከ Profile ገጽ ጋር በቀጥታ እንዲገናኝ የመነሻ ዋጋ 100 ተሰጥቶታል)
+    val totalBudget = if (viewModel.totalBudget.value == 0.0) 100.0 else viewModel.totalBudget.value
     val spentAmount = viewModel.getSpentAmount()
+    val remainingBudget = max(0.0, totalBudget - spentAmount)
     val progressFraction = if (totalBudget > 0) (spentAmount / totalBudget).toFloat() else 0.0f
 
     Column(
@@ -47,8 +55,10 @@ fun DashboardScreen(viewModel: WeddingViewModel) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(modifier = Modifier.height(16.dp))
+
+        // 🔗 🟢 የሙሽሮች ስም - እዚህ ጋ & የነበረው በ ❤️ ተተክቷል!
         Text(
-            text = "${viewModel.groomName.value} & ${viewModel.brideName.value}",
+            text = "${viewModel.groomName.value.ifBlank { "eyob" }} ❤️ ${viewModel.brideName.value.ifBlank { "someone" }}",
             style = MaterialTheme.typography.titleLarge.copy(fontFamily = FontFamily.Serif, fontWeight = FontWeight.Bold, fontSize = 24.sp),
             color = darkText
         )
@@ -114,7 +124,7 @@ fun DashboardScreen(viewModel: WeddingViewModel) {
                 Spacer(modifier = Modifier.height(12.dp))
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                     Text(text = "Spent: ${spentAmount.toInt()} ETB", style = MaterialTheme.typography.bodyMedium, color = darkText)
-                    Text(text = "Remaining: ${(totalBudget - spentAmount).toInt()} ETB", style = MaterialTheme.typography.bodyMedium, color = primaryRose)
+                    Text(text = "Remaining: ${remainingBudget.toInt()} ETB", style = MaterialTheme.typography.bodyMedium, color = primaryRose)
                 }
             }
         }
