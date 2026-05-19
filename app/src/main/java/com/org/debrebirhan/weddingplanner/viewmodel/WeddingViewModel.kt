@@ -96,6 +96,7 @@ class WeddingViewModel(application: Application) : AndroidViewModel(application)
         editor.apply()
     }
 
+
     // 📂 አፑ ሲከፈት የቆየውን ዳታ መልሶ ማምጫ ፈንክሽን
     private fun loadDataFromStorage() {
         groomName.value = sharedPreferences.getString("groom_name", "") ?: ""
@@ -122,7 +123,7 @@ class WeddingViewModel(application: Application) : AndroidViewModel(application)
             }
         }
 
-        // ወጪዎችን መጫን
+        // የወጪዎችን ሊስት መጫን
         expenseIdCounter = sharedPreferences.getInt("expense_counter", 1)
         val expensesJson = sharedPreferences.getString("expenses_json", null)
         if (!expensesJson.isNullOrEmpty()) {
@@ -155,14 +156,14 @@ class WeddingViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-    // 🎯 አዲስ ታስክ ሲጨመር፡ 1ኛ. ወደ ታስክ ሊስት ይገባል፣ 2ኛ. ወዲያውኑ በባጀት ገፅ ላይ በ 0.0 ብር እንዲታይ ይደረጋል፣ 3ኛ. በቋሚነት ስልኩ ላይ ይቆለፋል!
+    // 🎯 አዲስ ታስክ ሲጨመር፡ 1ኛ. ወደ ታስክ ሊስት ይገባል፣ 2ኛ. ወዲያውኑ በባጀት ገፅ ላይ በ 0.0 ብር እንዲታይ ይደረጋል፣ 3ኛ. ስልኩ ማከማቻ ላይ ይቆለፋል!
     fun addTask(title: String) {
         if (title.isNotBlank()) {
             // 1. ታስኩን መመዝገብ
             tasksList.add(WeddingTask(id = taskIdCounter++, title = title, isCompleted = false))
 
             // 2. ወዲያውኑ በዚሁ የታስክ ስም በ 0.0 ብር አዲስ ወጪ በባጀት ሊስት ውስጥ መፍጠር
-            val alreadyExists = expensesList.any { it.title == title }
+            val alreadyExists = expensesList.any { it.title.equals(title, ignoreCase = true) }
             if (!alreadyExists) {
                 expensesList.add(WeddingExpense(id = expenseIdCounter++, title = title, amount = 0.0))
             }
@@ -172,7 +173,7 @@ class WeddingViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-    // Toggles task completion state from Dashboard (ልክ እንደ ድሮው መደበኛ ስራውን ይሰራል)
+    // Toggles task completion state from Dashboard
     fun toggleTaskCompletion(taskId: Int) {
         val index = tasksList.indexOfFirst { it.id == taskId }
         if (index != -1) {
@@ -182,11 +183,12 @@ class WeddingViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-    // Records a new spending expense
+
+    // 🎯 አዲስ ወጪ መመዝገቢያ ወይም ከታስክ የመጣን ወጪ መሙያ ፈንክሽን (amount >= 0 መሆኑ ተስተካክሏል)
     fun addExpense(title: String, amount: Double) {
-        if (title.isNotBlank() && amount > 0) {
-            // ከታስክ የመጣ ተመሳሳይ ስም ያለው እና ብሩ 0.0 የሆነ ወጪ ካለ እሱን ያድሰዋል እንጂ አዲስ አይፈጥርም
-            val existingIndex = expensesList.indexOfFirst { it.title == title && it.amount == 0.0 }
+        if (title.isNotBlank() && amount >= 0) {
+            // ከታስክ የመጣ ተመሳሳይ ስም ያለው ወጪ ካለ የብር መጠኑን ያድሰዋል እንጂ አዲስ አይፈጥርም
+            val existingIndex = expensesList.indexOfFirst { it.title.equals(title, ignoreCase = true) }
             if (existingIndex != -1) {
                 expensesList[existingIndex] = expensesList[existingIndex].copy(amount = amount)
             } else {
