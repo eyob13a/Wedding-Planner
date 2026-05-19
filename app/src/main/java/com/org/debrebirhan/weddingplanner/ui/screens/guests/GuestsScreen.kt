@@ -9,6 +9,7 @@ import android.graphics.Path as AndroidPath
 import android.graphics.RectF
 import android.graphics.Typeface
 import android.net.Uri
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -92,18 +93,32 @@ fun GuestsScreen(viewModel: WeddingViewModel) {
 
         Text(text = "Choose Invitation Design", fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(12.dp))
+
+      
         LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             items(viewModel.invitationTemplates) { template ->
                 val isSelected = viewModel.selectedTemplate.value == template
-                Box(
+
+                Card(
                     modifier = Modifier
-                        .size(100.dp, 60.dp)
-                        .background(template.color, RoundedCornerShape(8.dp))
-                        .border(if (isSelected) 3.dp else 0.dp, Color.Black, RoundedCornerShape(8.dp))
+                        .size(110.dp, 65.dp)
                         .clickable { viewModel.selectedTemplate.value = template },
-                    contentAlignment = Alignment.Center
+                    shape = RoundedCornerShape(12.dp), 
+                    
+                    border = BorderStroke(
+                        width = if (isSelected) 2.5.dp else 1.dp,
+                        color = if (isSelected) Color.Black else Color.Black.copy(alpha = 0.2f)
+                    ),
+                    colors = CardDefaults.cardColors(containerColor = template.color)
                 ) {
-                    Text(text = template.themeName, color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text(
+                            text = template.themeName,
+                            color = Color.White,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
             }
         }
@@ -170,7 +185,7 @@ fun GuestsScreen(viewModel: WeddingViewModel) {
     }
 }
 
-// 🎨 የተስተካከለው የግብዣ ካርድ መስሪያ - አሁን የሙሽሮቹን ስዕል በትልቅ መሃል ላይ ይይዛል!
+
 fun generateWeddingCardImage(
     context: Context,
     guestName: String,
@@ -242,18 +257,16 @@ fun generateWeddingCardImage(
         typeface = Typeface.create(Typeface.SERIF, Typeface.BOLD_ITALIC)
     }
 
-    // Main Header Phrase
     textPaint.textSize = 36f
     textPaint.letterSpacing = 0.1f
     canvas.drawText("The Wedding Invitation", (width / 2).toFloat(), 150f, textPaint)
 
-    // 🎯 [አዲስ ክፍል]፦ የሙሽራና ሙሽሪት ስዕል (Emojis) በትልቅ መጠን ካርዱ መሃል ላይ ተቃቅፈው እንዲቀመጡ ተደርጓል
     val emojiPaint = Paint().apply {
         isAntiAlias = true
         textAlign = Paint.Align.CENTER
-        textSize = 90f // በካርዱ ላይ በደንብ ጎልቶ እንዲታይ የተሰጠ መጠን
+        textSize = 90f
     }
-    // ወንዱ፣ አበባው እና ሴቷ ተደራርበው የጋብቻውን ድባብ ይፈጥራሉ
+
     canvas.drawText("🤵‍♂️", (width / 2 - 55).toFloat(), 280f, emojiPaint)
     canvas.drawText("💐", (width / 2 - 5).toFloat(), 300f, Paint().apply { isAntiAlias = true; textAlign = Paint.Align.CENTER; textSize = 50f })
     canvas.drawText("👰‍♀️", (width / 2 + 45).toFloat(), 280f, emojiPaint)
@@ -287,7 +300,7 @@ fun generateWeddingCardImage(
     textPaint.color = android.graphics.Color.parseColor("#E0E0E0")
     canvas.drawText("at the holy matrimony celebrating the love of", (width / 2).toFloat(), 670f, textPaint)
 
-    // Master Unified Couples Typography (& በ ❤️ ተተክቷል)
+    // Master Unified Couples Typography
     textPaint.typeface = Typeface.create(Typeface.SERIF, Typeface.BOLD)
     textPaint.textSize = 68f
     textPaint.color = android.graphics.Color.WHITE
@@ -295,7 +308,7 @@ fun generateWeddingCardImage(
 
     textPaint.typeface = Typeface.create(Typeface.SERIF, Typeface.ITALIC)
     textPaint.textSize = 50f
-    textPaint.color = android.graphics.Color.parseColor("#D32F2F") // ቀይ የልብ ቀለም
+    textPaint.color = android.graphics.Color.parseColor("#D32F2F")
     canvas.drawText("❤️", (width / 2).toFloat(), 865f, textPaint)
 
     textPaint.typeface = Typeface.create(Typeface.SERIF, Typeface.BOLD)

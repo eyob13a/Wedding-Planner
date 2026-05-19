@@ -34,21 +34,22 @@ class WeddingViewModel(application: Application) : AndroidViewModel(application)
     val guestsList = mutableStateListOf<WeddingGuest>()
     private var guestIdCounter = 1
 
-    // Available invitation design portfolios
+
     val invitationTemplates = listOf(
         InvitationTemplate(1, "Classic Rose", Color(0xFFCD766D)),
         InvitationTemplate(2, "Royal Blue", Color(0xFF002D62)),
         InvitationTemplate(3, "Golden Grace", Color(0xFFD4AF37)),
-        InvitationTemplate(4, "Modern Mint", Color(0xFF98FF98))
+        InvitationTemplate(4, "Modern Mint", Color(0xFF98FF98)),
+        InvitationTemplate(5, "Burgundy", Color(0xFF800020)),     // አዲስ 1
+        InvitationTemplate(6, "Emerald", Color(0xFF0F5257)),      // አዲስ 2
+        InvitationTemplate(7, "Lavender", Color(0xFFE6E6FA))     // አዲስ 3
     )
     var selectedTemplate = mutableStateOf(invitationTemplates[0])
 
-    // 🎯 አፑ በጀመረ ቁጥር የተቀመጠውን መረጃ በራስ-ሰር ከስልኩ ላይ ይጭናል
     init {
         loadDataFromStorage()
     }
 
-    // 💾 መረጃዎችን በቋሚነት ስልኩ ላይ ማስቀመጫ ፈንክሽን
     fun saveDataToStorage() {
         val editor = sharedPreferences.edit()
         editor.putString("groom_name", groomName.value)
@@ -57,7 +58,6 @@ class WeddingViewModel(application: Application) : AndroidViewModel(application)
         editor.putLong("wedding_timestamp", weddingTimestamp.value)
         editor.putInt("selected_template_id", selectedTemplate.value.id)
 
-        // ታስኮችን ወደ JSON ቀይሮ ማስቀመጥ
         val tasksArray = JSONArray()
         tasksList.forEach { task ->
             val obj = JSONObject()
@@ -69,7 +69,6 @@ class WeddingViewModel(application: Application) : AndroidViewModel(application)
         editor.putString("tasks_json", tasksArray.toString())
         editor.putInt("task_counter", taskIdCounter)
 
-        // የወጪዎችን ሊስት ወደ JSON ቀይሮ ማስቀመጥ
         val expensesArray = JSONArray()
         expensesList.forEach { expense ->
             val obj = JSONObject()
@@ -81,7 +80,6 @@ class WeddingViewModel(application: Application) : AndroidViewModel(application)
         editor.putString("expenses_json", expensesArray.toString())
         editor.putInt("expense_counter", expenseIdCounter)
 
-        // የእንግዶችን ሊስት ወደ JSON ቀይሮ ማስቀመጥ
         val guestsArray = JSONArray()
         guestsList.forEach { guest ->
             val obj = JSONObject()
@@ -96,8 +94,6 @@ class WeddingViewModel(application: Application) : AndroidViewModel(application)
         editor.apply()
     }
 
-
-    // 📂 አፑ ሲከፈት የቆየውን ዳታ መልሶ ማምጫ ፈንክሽን
     private fun loadDataFromStorage() {
         groomName.value = sharedPreferences.getString("groom_name", "") ?: ""
         brideName.value = sharedPreferences.getString("bride_name", "") ?: ""
@@ -107,7 +103,6 @@ class WeddingViewModel(application: Application) : AndroidViewModel(application)
         val templateId = sharedPreferences.getInt("selected_template_id", 1)
         selectedTemplate.value = invitationTemplates.find { it.id == templateId } ?: invitationTemplates[0]
 
-        // ታስኮችን መጫን
         taskIdCounter = sharedPreferences.getInt("task_counter", 1)
         val tasksJson = sharedPreferences.getString("tasks_json", null)
         if (!tasksJson.isNullOrEmpty()) {
@@ -123,7 +118,6 @@ class WeddingViewModel(application: Application) : AndroidViewModel(application)
             }
         }
 
-        // የወጪዎችን ሊስት መጫን
         expenseIdCounter = sharedPreferences.getInt("expense_counter", 1)
         val expensesJson = sharedPreferences.getString("expenses_json", null)
         if (!expensesJson.isNullOrEmpty()) {
@@ -139,7 +133,6 @@ class WeddingViewModel(application: Application) : AndroidViewModel(application)
             }
         }
 
-        // እንግዶችን መጫን
         guestIdCounter = sharedPreferences.getInt("guest_counter", 1)
         val guestsJson = sharedPreferences.getString("guests_json", null)
         if (!guestsJson.isNullOrEmpty()) {
@@ -156,24 +149,41 @@ class WeddingViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-    // 🎯 አዲስ ታስክ ሲጨመር፡ 1ኛ. ወደ ታስክ ሊስት ይገባል፣ 2ኛ. ወዲያውኑ በባጀት ገፅ ላይ በ 0.0 ብር እንዲታይ ይደረጋል፣ 3ኛ. ስልኩ ማከማቻ ላይ ይቆለፋል!
     fun addTask(title: String) {
         if (title.isNotBlank()) {
-            // 1. ታስኩን መመዝገብ
             tasksList.add(WeddingTask(id = taskIdCounter++, title = title, isCompleted = false))
 
-            // 2. ወዲያውኑ በዚሁ የታስክ ስም በ 0.0 ብር አዲስ ወጪ በባጀት ሊስት ውስጥ መፍጠር
             val alreadyExists = expensesList.any { it.title.equals(title, ignoreCase = true) }
             if (!alreadyExists) {
                 expensesList.add(WeddingExpense(id = expenseIdCounter++, title = title, amount = 0.0))
             }
 
-            // 3. ዳታው እንዳይጠፋ ስልኩ ማከማቻ ላይ መቆለፍ
             saveDataToStorage()
         }
     }
 
-    // Toggles task completion state from Dashboard
+    fun updateTask(taskId: Int, oldTitle: String, newTitle: String) {
+        if (newTitle.isNotBlank()) {
+            val taskIndex = tasksList.indexOfFirst { it.id == taskId }
+            if (taskIndex != -1) {
+                tasksList[taskIndex] = tasksList[taskIndex].copy(title = newTitle)
+            }
+
+            val expenseIndex = expensesList.indexOfFirst { it.title.equals(oldTitle, ignoreCase = true) }
+            if (expenseIndex != -1) {
+                expensesList[expenseIndex] = expensesList[expenseIndex].copy(title = newTitle)
+            }
+
+            saveDataToStorage()
+        }
+    }
+
+    fun deleteTask(taskId: Int, taskTitle: String) {
+        tasksList.removeAll { it.id == taskId }
+        expensesList.removeAll { it.title.equals(taskTitle, ignoreCase = true) }
+        saveDataToStorage()
+    }
+
     fun toggleTaskCompletion(taskId: Int) {
         val index = tasksList.indexOfFirst { it.id == taskId }
         if (index != -1) {
@@ -183,11 +193,8 @@ class WeddingViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-
-    // 🎯 አዲስ ወጪ መመዝገቢያ ወይም ከታስክ የመጣን ወጪ መሙያ ፈንክሽን (amount >= 0 መሆኑ ተስተካክሏል)
     fun addExpense(title: String, amount: Double) {
         if (title.isNotBlank() && amount >= 0) {
-            // ከታስክ የመጣ ተመሳሳይ ስም ያለው ወጪ ካለ የብር መጠኑን ያድሰዋል እንጂ አዲስ አይፈጥርም
             val existingIndex = expensesList.indexOfFirst { it.title.equals(title, ignoreCase = true) }
             if (existingIndex != -1) {
                 expensesList[existingIndex] = expensesList[existingIndex].copy(amount = amount)
@@ -198,12 +205,10 @@ class WeddingViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-    // Dynamically calculates total spent amount from recorded expenses
     fun getSpentAmount(): Double {
         return expensesList.sumOf { it.amount }
     }
 
-    // Appends a new guest entry to the data collection
     fun addGuest(name: String) {
         if (name.isNotBlank()) {
             guestsList.add(WeddingGuest(id = guestIdCounter++, name = name))
@@ -211,7 +216,6 @@ class WeddingViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-    // Flags the invitation dispatch state as confirmed for a specific guest
     fun toggleInvitation(guestId: Int) {
         val index = guestsList.indexOfFirst { it.id == guestId }
         if (index != -1) {
@@ -221,7 +225,6 @@ class WeddingViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-    // 🔴 CRUD: Delete/Reset Operation (ሁሉንም መረጃዎች ሙሉ በሙሉ ከስልኩ ላይ ያጠፋል)
     fun resetAllData() {
         groomName.value = ""
         brideName.value = ""
