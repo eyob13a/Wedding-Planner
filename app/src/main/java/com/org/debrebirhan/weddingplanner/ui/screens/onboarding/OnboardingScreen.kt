@@ -15,6 +15,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha // 🔴 ስህተቱን ያስተካከለው ዋናው Import ይህ ነው!
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -30,7 +31,7 @@ import java.util.*
 
 @Composable
 fun OnboardingScreen(
-    viewModel: WeddingViewModel, // 🎯 ቪውሞዴሉ እዚህ ጋር እንዲደርሰን ተጨምሯል
+    viewModel: WeddingViewModel,
     onSetupComplete: (String, String, String, Long) -> Unit
 ) {
     var currentStep by remember { mutableStateOf(0) }
@@ -62,34 +63,45 @@ fun OnboardingScreen(
             ) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.padding(top = 70.dp)
+                    modifier = Modifier.padding(top = 75.dp)
                 ) {
                     Surface(
-                        modifier = Modifier.size(140.dp),
+                        modifier = Modifier.size(145.dp),
                         shape = CircleShape,
                         color = Color.White,
-                        border = BorderStroke(2.5.dp, primaryRose.copy(alpha = 0.7f)),
-                        shadowElevation = 6.dp
+                        border = BorderStroke(3.dp, primaryRose.copy(alpha = 0.8f)),
+                        shadowElevation = 8.dp
                     ) {
                         Box(contentAlignment = Alignment.Center) {
                             Row(
                                 horizontalArrangement = Arrangement.Center,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text(text = "🤵‍♂️", fontSize = 54.sp)
-                                Text(text = "💐", fontSize = 32.sp, modifier = Modifier.offset(x = (-8).dp, y = 10.dp))
-                                Text(text = "👰‍♀️", fontSize = 54.sp, modifier = Modifier.offset(x = (-14).dp))
+                                Text(text = "🤵‍♂️", fontSize = 56.sp)
+                                Text(text = "💐", fontSize = 34.sp, modifier = Modifier.offset(x = (-8).dp, y = 10.dp))
+                                Text(text = "👰‍♀️", fontSize = 56.sp, modifier = Modifier.offset(x = (-14).dp))
                             }
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(28.dp))
+                    Spacer(modifier = Modifier.height(24.dp))
 
-                    Canvas(modifier = Modifier.size(width = 120.dp, height = 40.dp)) {
-                        drawCircle(color = primaryRose, radius = 12f, center = Offset(size.width/2, size.height/2))
-                        drawCircle(color = primaryRose.copy(alpha = 0.6f), radius = 10f, center = Offset(size.width/2 - 30, size.height/2))
-                        drawCircle(color = primaryRose.copy(alpha = 0.6f), radius = 10f, center = Offset(size.width/2 + 30, size.height/2))
-                        drawLine(color = Color(0xFFCD766D).copy(alpha = 0.2f), start = Offset(size.width/2, 0f), end = Offset(size.width/2, size.height))
+
+                    // ✨ የጌጣጌጥ ዲዛይን (Decorative Hearts)
+                    Box(
+                        modifier = Modifier
+                            .width(100.dp)
+                            .height(30.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(14.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(text = "💖", fontSize = 16.sp, modifier = Modifier.alpha(0.6f))
+                            Text(text = "✨", fontSize = 12.sp, modifier = Modifier.alpha(0.4f))
+                            Text(text = "💖", fontSize = 16.sp, modifier = Modifier.alpha(0.6f))
+                        }
                     }
                 }
 
@@ -99,19 +111,19 @@ fun OnboardingScreen(
                         style = MaterialTheme.typography.headlineLarge.copy(
                             fontFamily = FontFamily.Serif,
                             fontWeight = FontWeight.Bold,
-                            fontSize = 38.sp,
-                            lineHeight = 44.sp
+                            fontSize = 42.sp,
+                            lineHeight = 48.sp
                         ),
                         color = darkText,
                         textAlign = TextAlign.Center
                     )
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
 
                     HorizontalDivider(
-                        color = primaryRose.copy(alpha = 0.3f),
-                        modifier = Modifier.width(120.dp),
-                        thickness = 1.dp
+                        color = primaryRose.copy(alpha = 0.4f),
+                        modifier = Modifier.width(100.dp),
+                        thickness = 1.5.dp
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -120,7 +132,8 @@ fun OnboardingScreen(
                         text = "Your perfect day, beautifully planned",
                         style = MaterialTheme.typography.bodyLarge.copy(
                             fontStyle = FontStyle.Italic,
-                            fontFamily = FontFamily.Serif
+                            fontFamily = FontFamily.Serif,
+                            fontSize = 17.sp
                         ),
                         color = darkText.copy(alpha = 0.8f),
                         textAlign = TextAlign.Center
@@ -137,11 +150,12 @@ fun OnboardingScreen(
                             .fillMaxWidth()
                             .height(56.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = primaryRose),
-                        shape = RoundedCornerShape(28.dp)
+                        shape = RoundedCornerShape(28.dp),
+                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
                     ) {
                         Text(
                             text = "Get Started",
-                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Medium),
+                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, fontSize = 18.sp),
                             color = Color.White
                         )
                     }
@@ -158,7 +172,7 @@ fun OnboardingScreen(
         val context = LocalContext.current
         val calendar = Calendar.getInstance()
 
-        // ከዚህ በፊት የተመረጠ ቀን ካለ እሱን በፅሁፍ ማሳያ
+
         if (weddingTimestamp != 0L) {
             val savedCalendar = Calendar.getInstance().apply { timeInMillis = weddingTimestamp }
             selectedDateText = "${savedCalendar.get(Calendar.DAY_OF_MONTH)}/${savedCalendar.get(Calendar.MONTH) + 1}/${savedCalendar.get(Calendar.YEAR)}"
@@ -231,6 +245,7 @@ fun OnboardingScreen(
                     singleLine = true
                 )
 
+
                 OutlinedTextField(
                     value = selectedDateText,
                     onValueChange = {},
@@ -248,16 +263,13 @@ fun OnboardingScreen(
                 Button(
                     onClick = {
                         if (groomName.isNotBlank() && brideName.isNotBlank() && weddingBudget.isNotBlank() && weddingTimestamp != 0L) {
-                            // 🎯 መጀመሪያ በቪውሞዴሉ ውስጥ ያሉትን ተለዋዋጮች እናድሳለን
                             viewModel.groomName.value = groomName
                             viewModel.brideName.value = brideName
                             viewModel.totalBudget.value = weddingBudget.toDoubleOrNull() ?: 0.0
                             viewModel.weddingTimestamp.value = weddingTimestamp
 
-                            // 🎯 ወዲያውኑ ዳታው እንዳይጠፋ ስልኩ ማከማቻ (Preferences) ላይ እንቆልፈዋለን
                             viewModel.saveDataToStorage()
 
-                            // ወደ ቀጣዩ ዳሽቦርድ ማለፍ
                             onSetupComplete(groomName, brideName, weddingBudget, weddingTimestamp)
                         }
                     },
