@@ -18,7 +18,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // አፑ ለመጀመሪያ ጊዜ እየተከፈተ መሆኑን (Onboarding ማለፉን) ብቻ ለመለየት የምንጠቀምበት Preferences
+       
         val sharedPreferences = getSharedPreferences("WeddingPlannerPrefs", Context.MODE_PRIVATE)
 
         setContent {
@@ -29,13 +29,13 @@ class MainActivity : ComponentActivity() {
                     }
 
                     if (!isSetupComplete) {
-                        // 🎯 እዚህ ጋ አዲሱን አጠራር (viewModel = weddingViewModel) በትክክል አስገብተነዋል
+                        
                         OnboardingScreen(
                             viewModel = weddingViewModel,
                             onSetupComplete = { g, b, bud, time ->
                                 isSetupComplete = true
 
-                                // Onboarding ማለፉን ብቻ እዚህ ጋር እንመዘግባለን (ሌላው ዳታ በ ViewModel ውስጥ ተቀምጧል)
+                               
                                 sharedPreferences.edit().apply {
                                     putBoolean("isSetupComplete", true)
                                     apply()

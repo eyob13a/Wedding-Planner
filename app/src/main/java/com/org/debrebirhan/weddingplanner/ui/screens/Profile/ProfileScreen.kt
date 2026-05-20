@@ -36,12 +36,10 @@ fun ProfileScreen(viewModel: WeddingViewModel) {
     val scrollState = rememberScrollState()
     val context = LocalContext.current
 
-    // የጽሑፍ ሳጥኖቹ ስቴት (Edit Form States)
     var groomInput by remember { mutableStateOf("") }
     var brideInput by remember { mutableStateOf("") }
     var budgetInput by remember { mutableStateOf("") }
 
-    // ገጹ በተከፈተ ቁጥር ቪውሞዴል ውስጥ ያለውን ወቅታዊ መረጃ በሳጥኖቹ ውስጥ ይጭናል
     LaunchedEffect(viewModel.groomName.value, viewModel.brideName.value, viewModel.totalBudget.value) {
         groomInput = viewModel.groomName.value
         brideInput = viewModel.brideName.value
@@ -50,7 +48,6 @@ fun ProfileScreen(viewModel: WeddingViewModel) {
 
     var showDeleteDialog by remember { mutableStateOf(false) }
 
-    // 📅 ተጠቃሚው የመረጠውን እውነተኛ ቀን ማሳያ ፎርማት ማድረጊያ
     val sdf = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
     val userSelectedDate = if (viewModel.weddingTimestamp.value > 0) {
         sdf.format(Date(viewModel.weddingTimestamp.value))
@@ -58,7 +55,6 @@ fun ProfileScreen(viewModel: WeddingViewModel) {
         "May 21, 2026 (Default)"
     }
 
-    // DatePicker Dialog - ተጠቃሚው ቀኑን ለመቀየር ሲጫነው የሚከፈት
     val calendar = Calendar.getInstance()
     val datePickerDialog = DatePickerDialog(
         context,
@@ -88,7 +84,6 @@ fun ProfileScreen(viewModel: WeddingViewModel) {
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        // 🟢 1. READ DISPLAY BANNER (ተጠቃሚው የሞላውን መረጃ ማሳያ)
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(containerColor = primaryRose),
@@ -109,15 +104,14 @@ fun ProfileScreen(viewModel: WeddingViewModel) {
                 }
                 Spacer(modifier = Modifier.width(16.dp))
                 Column {
-                    // 🎯 እዚህ ጋ & የነበረው በትክክል በ ❤️ ምልክት ተተክቷል!
                     Text(
-                        text = "${viewModel.groomName.value.ifBlank { "eyob" }} ❤️ ${viewModel.brideName.value.ifBlank { "someone" }}",
+                        text = "${viewModel.groomName.value.ifBlank { " " }} ❤️ ${viewModel.brideName.value.ifBlank { " " }}",
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
                     )
                     Text(
-                        text = "Allocated Budget: ${if (viewModel.totalBudget.value == 0.0) 100.0 else viewModel.totalBudget.value} ETB",
+                        text = "Allocated Budget: ${if (viewModel.totalBudget.value == 0.0) 0 else viewModel.totalBudget.value} ETB",
                         color = Color.White.copy(alpha = 0.9f),
                         fontSize = 13.sp
                     )
@@ -132,7 +126,6 @@ fun ProfileScreen(viewModel: WeddingViewModel) {
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // 🔵 2. UPDATE FORM (መረጃ ማስተካከያ)
         Text(text = "Update Wedding Info", fontWeight = FontWeight.Bold, fontSize = 15.sp, color = Color.DarkGray)
         Spacer(modifier = Modifier.height(10.dp))
 
@@ -217,7 +210,6 @@ fun ProfileScreen(viewModel: WeddingViewModel) {
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // 🔴 3. DANGER ZONE (ዳታ ማጥፊያ)
         Text(text = "Danger Zone", fontWeight = FontWeight.Bold, fontSize = 15.sp, color = Color(0xFFD32F2F))
         Spacer(modifier = Modifier.height(10.dp))
 
@@ -249,7 +241,6 @@ fun ProfileScreen(viewModel: WeddingViewModel) {
         }
     }
 
-    // 🔴 የዲሊት ማረጋገጫ Dialog
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },

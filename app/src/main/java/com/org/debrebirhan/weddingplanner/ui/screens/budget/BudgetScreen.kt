@@ -27,7 +27,7 @@ fun BudgetScreen(viewModel: WeddingViewModel) {
     val spentAmount = viewModel.getSpentAmount()
     val remainingBudget = totalBudget - spentAmount
 
-    // የመሙያ ሣጥን ስቴቶች
+    
     var expenseTitle by remember { mutableStateOf("") }
     var expenseAmount by remember { mutableStateOf("") }
 
@@ -49,7 +49,7 @@ fun BudgetScreen(viewModel: WeddingViewModel) {
         )
         Spacer(modifier = Modifier.height(16.dp))
 
-        // 1️⃣ 🎯 ትልልቅ የባጀት ማሳያ ካርዶች (Total & Remaining Budget)
+      
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -67,7 +67,7 @@ fun BudgetScreen(viewModel: WeddingViewModel) {
                 }
             }
 
-            // Remaining Budget ካርድ (ባጀት ካለቀ በቀይ ቀለም ይተካል)
+            
             Card(
                 modifier = Modifier.weight(1f),
                 shape = RoundedCornerShape(16.dp),
@@ -90,7 +90,7 @@ fun BudgetScreen(viewModel: WeddingViewModel) {
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // 2️⃣ 🎯 መረጃ መሙያ ሣጥኖች (Input Layout)
+        
         OutlinedTextField(
             value = expenseTitle,
             onValueChange = { expenseTitle = it },
@@ -111,7 +111,7 @@ fun BudgetScreen(viewModel: WeddingViewModel) {
         Button(
             onClick = {
                 val amount = expenseAmount.toDoubleOrNull() ?: 0.0
-                // አዲስ ለመመዝገብ ወይም ከታስክ የመጣን ለማደስ ስም መኖሩ እና ብሩ ከ 0 በላይ መሆኑን ያረጋግጣል
+                
                 if (expenseTitle.isNotBlank() && amount >= 0) {
                     viewModel.addExpense(expenseTitle, amount)
                     expenseTitle = ""
@@ -134,7 +134,7 @@ fun BudgetScreen(viewModel: WeddingViewModel) {
         )
         Spacer(modifier = Modifier.height(10.dp))
 
-        // 3️⃣ 🎯 የወጪዎች ዝርዝር (LazyColumn) - ክሊክ ሲደረግ ፎርሙን በራስ-ሰር ይሞላል
+        
         LazyColumn(modifier = Modifier.fillMaxSize()) {
             items(viewModel.expensesList) { expense ->
                 Card(
@@ -142,7 +142,7 @@ fun BudgetScreen(viewModel: WeddingViewModel) {
                         .fillMaxWidth()
                         .padding(bottom = 8.dp)
                         .clickable {
-                            // 🎯 የወጪ መስመሩ ሲነካ መግለጫውን እና ብሩን ወደ ላይኛው ፎርም ይልከዋል!
+                           
                             expenseTitle = expense.title
                             expenseAmount = if (expense.amount > 0) expense.amount.toInt().toString() else ""
                         },

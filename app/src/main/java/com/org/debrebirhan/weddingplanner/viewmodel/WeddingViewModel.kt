@@ -40,9 +40,9 @@ class WeddingViewModel(application: Application) : AndroidViewModel(application)
         InvitationTemplate(2, "Royal Blue", Color(0xFF002D62)),
         InvitationTemplate(3, "Golden Grace", Color(0xFFD4AF37)),
         InvitationTemplate(4, "Modern Mint", Color(0xFF98FF98)),
-        InvitationTemplate(5, "Burgundy", Color(0xFF800020)),     // አዲስ 1
-        InvitationTemplate(6, "Emerald", Color(0xFF0F5257)),      // አዲስ 2
-        InvitationTemplate(7, "Lavender", Color(0xFFE6E6FA))     // አዲስ 3
+        InvitationTemplate(5, "Burgundy", Color(0xFF800020)),     
+        InvitationTemplate(6, "Emerald", Color(0xFF0F5257)),      
+        InvitationTemplate(7, "Lavender", Color(0xFFE6E6FA))     
     )
     var selectedTemplate = mutableStateOf(invitationTemplates[0])
 
